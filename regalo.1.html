@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Campo de Girasoles al Atardecer 🌻</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Cormorant Garamond for poem & Montserrat for UI -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['"Cormorant Garamond"', 'serif'],
+            sans: ['"Montserrat"', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Montserrat', sans-serif;
+      background-color: #120602;
+      color: #fff8f0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+
+    /* Glassmorphism containers */
+    .glass-card {
+      background: rgba(24, 11, 7, 0.82);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(251, 191, 36, 0.3);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 
+                  0 0 35px rgba(245, 158, 11, 0.25);
+    }
+
+    .glass-card-sunset {
+      background: rgba(35, 16, 8, 0.88);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(253, 224, 71, 0.4);
+      box-shadow: 0 30px 70px rgba(0, 0, 0, 0.9),
+                  0 0 50px rgba(251, 191, 36, 0.3);
+    }
+
+    /* Sunset animated primary button */
+    .btn-sunset {
+      background: linear-gradient(135deg, #f59e0b 0%, #ea580c 50%, #d97706 100%);
+      background-size: 200% 200%;
+      animation: gradientMove 5s ease infinite;
+      box-shadow: 0 4px 25px rgba(245, 158, 11, 0.5);
+      transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .btn-sunset:hover {
+      transform: translateY(-3px) scale(1.03);
+      box-shadow: 0 8px 35px rgba(245, 158, 11, 0.8), 0 0 25px rgba(253, 224, 71, 0.6);
+    }
+
+    .btn-sunset:active {
+      transform: translateY(1px) scale(0.98);
+    }
+
+    /* Pulsing button for revealing final message */
+    .btn-message-reveal {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.95), rgba(225, 29, 72, 0.92));
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(254, 240, 138, 0.7);
+      box-shadow: 0 10px 30px rgba(245, 158, 11, 0.5), 0 0 25px rgba(253, 224, 71, 0.4);
+      animation: pulseGlow 3s infinite ease-in-out;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% {
+        box-shadow: 0 10px 30px rgba(245, 158, 11, 0.5), 0 0 25px rgba(253, 224, 71, 0.4);
+        transform: translateY(0px);
+      }
+      50% {
+        box-shadow: 0 15px 40px rgba(245, 158, 11, 0.85), 0 0 38px rgba(253, 224, 71, 0.75);
+        transform: translateY(-4px);
+      }
+    }
+
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .text-glow-gold {
+      text-shadow: 0 0 20px rgba(253, 224, 71, 0.7), 0 0 40px rgba(245, 158, 11, 0.4);
+    }
+
+    .click-badge {
+      animation: floatPulse 3s ease-in-out infinite;
+    }
+
+    @keyframes floatPulse {
+      0%, 100% { transform: translateY(0px); opacity: 0.85; }
+      50% { transform: translateY(-4px); opacity: 1; }
+    }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(20, 10, 5, 0.8); }
+    ::-webkit-scrollbar-thumb { background: rgba(245, 158, 11, 0.6); border-radius: 3px; }
+  </style>
+</head>
+<body class="h-full w-full relative overflow-hidden bg-slate-950">
+
+  <!-- Layer 1: Background Canvas for Sunset Field, Grass, Sunflowers, Butterflies & Pollen -->
+  <canvas id="mainCanvas" class="absolute inset-0 w-full h-full z-0 block cursor-pointer"></canvas>
+
+  <!-- Screen 1: Dark Burgundy Intro Cover Screen -->
+  <div id="introScreen" class="absolute inset-0 z-20 flex items-center justify-center p-4 transition-all duration-1000 ease-out">
+    <div class="glass-card rounded-3xl p-8 md:p-12 max-w-lg w-full text-center relative overflow-hidden">
+      
+      <!-- Ambient Glow Behind Card -->
+      <div class="absolute -top-20 -left-20 w-44 h-44 bg-amber-500/20 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-20 -right-20 w-44 h-44 bg-orange-600/20 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-500/15 border border-amber-500/40 mb-6 text-3xl shadow-inner">
+        🌻
+      </div>
+
+      <h1 id="introTitle" class="font-serif text-3xl md:text-5xl font-bold text-amber-100 tracking-wide mb-4 text-glow-gold">
+        Para ustedes
+      </h1>
+
+      <p id="introMessage" class="text-amber-100/90 text-xs md:text-sm leading-relaxed font-light mb-8 max-w-sm mx-auto">
+        Un rincón poético bañado en la luz cálida del atardecer, creado especialmente para ustedes. Abran este regalo para dejar que florezca.
+      </p>
+
+      <button id="startBtn" class="btn-sunset w-full sm:w-auto px-8 py-4 rounded-2xl text-amber-950 font-bold text-base md:text-lg tracking-wide flex items-center justify-center gap-3 mx-auto cursor-pointer group">
+        <span>Abrir el regalo</span>
+        <span class="text-xl transition-transform duration-300 group-hover:rotate-12 group-hover:scale-125">🌻</span>
+      </button>
+
+      <div class="mt-6 text-[11px] text-amber-300/70 font-light italic">
+        ✨ Experiencia interactiva con sonidos del atardecer
+      </div>
+    </div>
+  </div>
+
+  <!-- Screen 2: Transition Overlay ("Esperen...") -->
+  <div id="transitionScreen" class="absolute inset-0 z-30 flex items-center justify-center p-6 bg-slate-950/80 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-1000">
+    <div class="text-center max-w-lg">
+      <div class="inline-block mb-6 relative">
+        <div class="w-14 h-14 rounded-full border-2 border-amber-400/20 border-t-amber-400 animate-spin"></div>
+        <div class="absolute inset-0 flex items-center justify-center text-sm">🌻</div>
+      </div>
+      <h2 class="font-serif text-2xl md:text-4xl text-amber-200 font-medium tracking-wide leading-relaxed text-glow-gold">
+        Esperen... algo está floreciendo para ustedes.
+      </h2>
+      <p class="text-amber-400/70 text-xs mt-3 tracking-widest uppercase font-light">
+        El campo cobra vida al atardecer
+      </p>
+    </div>
+  </div>
+
+  <!-- HUD Controls (Top Right Audio Button) -->
+  <div id="hudControls" class="absolute top-4 right-4 z-40 flex items-center gap-3 opacity-0 transition-opacity duration-1000 pointer-events-none">
+    <button id="audioBtn" onclick="toggleAudio()" class="glass-card p-3 rounded-full text-amber-300 hover:text-amber-100 hover:bg-amber-500/20 transition-all cursor-pointer border border-amber-500/30 shadow-lg flex items-center gap-2 px-4 text-xs font-semibold" title="Activar / Desactivar Música">
+      <span id="audioIcon">🎵</span>
+      <span id="audioText" class="hidden sm:inline">Música</span>
+    </button>
+  </div>
+
+  <!-- Persistent Bottom Floating Controls -->
+  <div id="bottomHud" class="absolute bottom-6 left-0 right-0 z-20 flex flex-col items-center gap-3 pointer-events-none opacity-0 transition-opacity duration-1000">
+    
+    <!-- Floating Trigger Button to Open Message Modal -->
+    <button id="revealMessageBtn" onclick="openFinalModal()" class="pointer-events-auto btn-message-reveal px-7 py-3.5 rounded-full text-white font-serif font-bold text-base md:text-lg flex items-center gap-3 shadow-2xl hover:scale-105 active:scale-95 transition-transform cursor-pointer">
+      <span class="text-amber-200 text-xl">💛</span>
+      <span>Leer nuestro mensaje</span>
+      <span class="text-amber-200 text-xl">🌻</span>
+    </button>
+
+    <!-- Interactive Hint Banner -->
+    <div class="click-badge glass-card px-5 py-2 rounded-full border border-amber-400/30 text-amber-200/90 text-xs md:text-sm font-medium flex items-center gap-2 shadow-xl">
+      <span class="text-amber-300">✨</span>
+      <span>Toca cualquier parte del campo para plantar nuevos girasoles</span>
+    </div>
+  </div>
+
+  <!-- Screen 3: Final Gift Card Screen (Modal) -->
+  <div id="finalScreen" class="absolute inset-0 z-40 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-700 bg-slate-950/60 backdrop-blur-sm">
+    <div class="glass-card-sunset rounded-3xl p-8 md:p-12 max-w-xl w-full text-center relative overflow-hidden border border-amber-400/40">
+      
+      <!-- Close Button to return to Field View anytime -->
+      <button onclick="closeFinalModal()" class="absolute top-4 right-4 w-10 h-10 rounded-full bg-amber-500/20 hover:bg-amber-500/40 text-amber-200 border border-amber-400/30 flex items-center justify-center text-lg transition-all cursor-pointer" title="Volver al campo">
+        ✕
+      </button>
+
+      <div class="mb-4 inline-flex items-center justify-center w-14 h-14 rounded-full bg-amber-500/20 border border-amber-400/40 text-2xl text-amber-300 shadow-lg">
+        🌅
+      </div>
+
+      <h2 id="finalTitle" class="font-serif text-3xl md:text-5xl font-bold text-amber-100 mb-4 text-glow-gold">
+        Un Campo Florecido al Atardecer
+      </h2>
+
+      <p id="finalBody" class="text-amber-100/95 text-sm md:text-base leading-relaxed font-serif italic mb-8 max-w-md mx-auto">
+        "Así como cada girasol busca la calidez del sol al atardecer, este campo floreció especialmente para recordarles lo hermosas e iluminadas que son sus vidas. Que nunca falte la luz en su camino."
+      </p>
+
+      <div id="finalSender" class="text-amber-300 font-sans text-xs tracking-widest uppercase mb-8 font-bold">
+        💛 Con todo nuestro cariño
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+        <button onclick="closeFinalModal()" class="w-full sm:w-auto px-6 py-3.5 rounded-xl btn-sunset text-amber-950 font-bold text-xs md:text-sm shadow-lg flex items-center justify-center gap-2">
+          <span>🌻</span> Volver a contemplar el campo
+        </button>
+        <button onclick="openEditModal()" class="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-amber-100 border border-amber-500/30 text-xs md:text-sm font-semibold transition-all flex items-center justify-center gap-2">
+          <span>✏️</span> Personalizar Mensaje
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Customization Modal -->
+  <div id="editModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300">
+    <div class="glass-card rounded-2xl p-6 md:p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto border border-amber-500/40">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="font-serif text-xl md:text-2xl font-bold text-amber-200">Personalizar el Mensaje</h3>
+        <button onclick="closeEditModal()" class="text-amber-400 hover:text-white text-xl">✕</button>
+      </div>
+
+      <div class="space-y-4 text-left">
+        <div>
+          <label class="block text-xs text-amber-300 uppercase tracking-wider mb-1 font-semibold">Título Inicial</label>
+          <input type="text" id="inputIntroTitle" class="w-full bg-slate-900/90 border border-amber-500/30 rounded-lg p-3 text-sm text-amber-100 focus:border-amber-400 outline-none">
+        </div>
+
+        <div>
+          <label class="block text-xs text-amber-300 uppercase tracking-wider mb-1 font-semibold">Mensaje de Inicio</label>
+          <textarea id="inputIntroMsg" rows="3" class="w-full bg-slate-900/90 border border-amber-500/30 rounded-lg p-3 text-sm text-amber-100 focus:border-amber-400 outline-none"></textarea>
+        </div>
+
+        <hr class="border-amber-500/20 my-4">
+
+        <div>
+          <label class="block text-xs text-amber-300 uppercase tracking-wider mb-1 font-semibold">Título Final</label>
+          <input type="text" id="inputFinalTitle" class="w-full bg-slate-900/90 border border-amber-500/30 rounded-lg p-3 text-sm text-amber-100 focus:border-amber-400 outline-none">
+        </div>
+
+        <div>
+          <label class="block text-xs text-amber-300 uppercase tracking-wider mb-1 font-semibold">Mensaje Final</label>
+          <textarea id="inputFinalBody" rows="4" class="w-full bg-slate-900/90 border border-amber-500/30 rounded-lg p-3 text-sm text-amber-100 focus:border-amber-400 outline-none"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs text-amber-300 uppercase tracking-wider mb-1 font-semibold">Firma / Remitente</label>
+          <input type="text" id="inputFinalSender" class="w-full bg-slate-900/90 border border-amber-500/30 rounded-lg p-3 text-sm text-amber-100 focus:border-amber-400 outline-none">
+        </div>
+      </div>
+
+      <div class="mt-6 flex gap-3 justify-end">
+        <button onclick="closeEditModal()" class="px-4 py-2 rounded-lg bg-slate-800 text-amber-200 text-xs font-medium hover:bg-slate-700">
+          Cancelar
+        </button>
+        <button onclick="saveCustomizations()" class="px-5 py-2 rounded-lg btn-sunset text-amber-950 font-bold text-xs">
+          Guardar Cambios 🌻
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ====================================================================
+       WEB AUDIO SYNTHESIZER (Safe initialization with error boundary)
+       ==================================================================== */
+    class SunsetAudioEngine {
+      constructor() {
+        this.ctx = null;
+        this.isPlaying = false;
+        this.timer = null;
+        this.notes = [174.61, 220.00, 261.63, 329.63, 349.23, 440.00, 523.25, 659.25];
+      }
+
+      init() {
+        try {
+          if (!this.ctx) {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (AudioContext) {
+              this.ctx = new AudioContext();
+            }
+          }
+        } catch (e) {
+          console.warn('Web Audio not supported or blocked:', e);
+        }
+      }
+
+      start() {
+        try {
+          this.init();
+          if (this.ctx) {
+            if (this.ctx.state === 'suspended') {
+              this.ctx.resume();
+            }
+            this.isPlaying = true;
+            this.playWarmDrone();
+            this.scheduleMelody();
+          }
+        } catch (e) {
+          console.warn('Error starting audio:', e);
+        }
+      }
+
+      stop() {
+        this.isPlaying = false;
+        if (this.timer) clearInterval(this.timer);
+      }
+
+      playWarmDrone() {
+        if (!this.isPlaying || !this.ctx) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          const filter = this.ctx.createBiquadFilter();
+
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(130.81, this.ctx.currentTime);
+
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(280, this.ctx.currentTime);
+
+          gain.gain.setValueAtTime(0.001, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.065, this.ctx.currentTime + 3);
+
+          osc.connect(filter);
+          filter.connect(gain);
+          gain.connect(this.ctx.destination);
+
+          osc.start();
+        } catch(e) {}
+      }
+
+      playChime() {
+        if (!this.isPlaying || !this.ctx) return;
+        try {
+          const freq = this.notes[Math.floor(Math.random() * this.notes.length)];
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+
+          const now = this.ctx.currentTime;
+          gain.gain.setValueAtTime(0, now);
+          gain.gain.linearRampToValueAtTime(0.035, now + 1.5);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 5.5);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+
+          osc.start(now);
+          osc.stop(now + 5.6);
+        } catch(e) {}
+      }
+
+      scheduleMelody() {
+        this.playChime();
+        this.timer = setInterval(() => {
+          if (this.isPlaying && Math.random() > 0.25) {
+            this.playChime();
+          }
+        }, 1600);
+      }
+    }
+
+    const audioEngine = new SunsetAudioEngine();
+    let audioActive = false;
+
+    function toggleAudio() {
+      audioActive = !audioActive;
+      const audioIcon = document.getElementById('audioIcon');
+      const audioText = document.getElementById('audioText');
+      
+      if (audioActive) {
+        audioEngine.start();
+        if (audioIcon) audioIcon.innerText = '🔊';
+        if (audioText) audioText.innerText = 'Música ON';
+      } else {
+        audioEngine.stop();
+        if (audioIcon) audioIcon.innerText = '🔇';
+        if (audioText) audioText.innerText = 'Música OFF';
+      }
+    }
+
+    /* ====================================================================
+       CANVAS GRAPHICS ENGINE
+       ==================================================================== */
+    const canvas = document.getElementById('mainCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let width = 0;
+    let height = 0;
+    let dpr = 1;
+
+    function resizeCanvas() {
+      dpr = window.devicePixelRatio || 1;
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      ctx.scale(dpr, dpr);
+      
+      initGrassBlades();
+    }
+    window.addEventListener('resize', resizeCanvas);
+
+    let currentPhase = 0; // 0: Intro, 1: Transition, 2: Hero Bloom, 3: Wave Bloom, 4: Full Field View
+    let animationTime = 0;
+    let heroSunflower = null;
+    let fieldSunflowers = [];
+    let horizonBloomClusters = [];
+    let pollenParticles = [];
+    let butterflies = [];
+    let grassBlades = [];
+    let phaseStartTime = 0;
+
+    /* Butterfly Class */
+    class Butterfly {
+      constructor(x, y, scale = 1, colorType = 'monarch') {
+        this.x = x;
+        this.y = y;
+        this.scale = scale;
+        this.colorType = colorType;
+        
+        this.wingAngle = Math.random() * Math.PI * 2;
+        this.wingSpeed = 0.22 + Math.random() * 0.15;
+        
+        this.vx = (Math.random() - 0.5) * 1.5;
+        this.vy = (Math.random() - 0.5) * 1.0;
+        
+        this.targetX = x;
+        this.targetY = y;
+        this.changeTargetTimer = 0;
+      }
+
+      update(dt) {
+        this.wingAngle += this.wingSpeed;
+
+        this.changeTargetTimer -= dt;
+        if (this.changeTargetTimer <= 0) {
+          this.targetX = Math.random() * width;
+          this.targetY = height * 0.32 + Math.random() * (height * 0.5);
+          this.changeTargetTimer = 3 + Math.random() * 4;
+        }
+
+        this.vx += (this.targetX - this.x) * 0.00025;
+        this.vy += (this.targetY - this.y) * 0.00025;
+
+        const speed = Math.hypot(this.vx, this.vy);
+        if (speed > 2.8) {
+          this.vx = (this.vx / speed) * 2.8;
+          this.vy = (this.vy / speed) * 2.8;
+        }
+
+        this.x += this.vx;
+        this.y += this.vy;
+
+        if (this.x < -20) this.x = width + 20;
+        if (this.x > width + 20) this.x = -20;
+        if (this.y < height * 0.2) this.y = height * 0.4;
+        if (this.y > height + 20) this.y = height * 0.7;
+      }
+
+      draw(ctx) {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+
+        const flightAngle = Math.atan2(this.vy, this.vx) + Math.PI / 2;
+        ctx.rotate(flightAngle * 0.3);
+        ctx.scale(this.scale, this.scale);
+
+        const flap = Math.sin(this.wingAngle);
+
+        let mainColor = '#f97316';
+        let secondaryColor = '#fde047';
+        if (this.colorType === 'gold') {
+          mainColor = '#fbbf24';
+          secondaryColor = '#fef08a';
+        } else if (this.colorType === 'lavender') {
+          mainColor = '#c084fc';
+          secondaryColor = '#e9d5ff';
+        } else if (this.colorType === 'blue') {
+          mainColor = '#38bdf8';
+          secondaryColor = '#bae6fd';
+        }
+
+        // Left Wing
+        ctx.save();
+        ctx.scale(flap, 1);
+        ctx.beginPath();
+        ctx.moveTo(0, -2);
+        ctx.bezierCurveTo(-18, -20, -26, 4, -4, 10);
+        ctx.fillStyle = mainColor;
+        ctx.fill();
+        ctx.strokeStyle = '#1c1917';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(-8, -4, 3, 0, Math.PI * 2);
+        ctx.fillStyle = secondaryColor;
+        ctx.fill();
+        ctx.restore();
+
+        // Right Wing
+        ctx.save();
+        ctx.scale(-flap, 1);
+        ctx.beginPath();
+        ctx.moveTo(0, -2);
+        ctx.bezierCurveTo(-18, -20, -26, 4, -4, 10);
+        ctx.fillStyle = mainColor;
+        ctx.fill();
+        ctx.strokeStyle = '#1c1917';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(-8, -4, 3, 0, Math.PI * 2);
+        ctx.fillStyle = secondaryColor;
+        ctx.fill();
+        ctx.restore();
+
+        // Body
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 2.2, 9, 0, 0, Math.PI * 2);
+        ctx.fillStyle = '#1c1917';
+        ctx.fill();
+
+        ctx.restore();
+      }
+    }
+
+    function initGrassBlades() {
+      grassBlades = [];
+      const density = Math.floor(width / 3.2);
+
+      for (let i = 0; i < density; i++) {
+        const x = Math.random() * width;
+        const hillY = height - Math.sin((x / width) * Math.PI) * (height * 0.15) - Math.random() * (height * 0.38);
+        
+        const bladeHeight = 16 + Math.random() * 32;
+        const bladeWidth = 2 + Math.random() * 2.8;
+        const lean = (Math.random() - 0.5) * 20;
+        const swayPhase = Math.random() * Math.PI * 2;
+        const swaySpeed = 0.002 + Math.random() * 0.0015;
+
+        const greenShades = ['#1e4620', '#2d6a31', '#3a833f', '#4d9e53', '#70b342', '#a3e635'];
+        const color = greenShades[Math.floor(Math.random() * greenShades.length)];
+
+        grassBlades.push({ x, y: hillY, height: bladeHeight, width: bladeWidth, lean, swayPhase, swaySpeed, color });
+      }
+
+      grassBlades.sort((a, b) => a.y - b.y);
+    }
+
+    function drawGrassBlades(ctx, globalTime, growthProgress = 1) {
+      if (growthProgress <= 0) return;
+
+      grassBlades.forEach(g => {
+        ctx.save();
+        const currentH = g.height * Math.min(1, growthProgress);
+        const sway = Math.sin(globalTime * g.swaySpeed + g.swayPhase) * 10;
+        
+        ctx.beginPath();
+        ctx.moveTo(g.x, g.y);
+        ctx.quadraticCurveTo(
+          g.x + g.lean * 0.5, 
+          g.y - currentH * 0.5, 
+          g.x + g.lean + sway, 
+          g.y - currentH
+        );
+        ctx.quadraticCurveTo(
+          g.x + g.width + g.lean * 0.5, 
+          g.y - currentH * 0.5, 
+          g.x + g.width, 
+          g.y
+        );
+
+        ctx.fillStyle = g.color;
+        ctx.fill();
+        ctx.restore();
+      });
+    }
+
+    class Sunflower {
+      constructor(x, y, targetHeight, scale = 1, isHero = false, delay = 0) {
+        this.x = x;
+        this.y = y;
+        this.targetHeight = targetHeight;
+        this.scale = scale;
+        this.isHero = isHero;
+        this.delay = delay;
+
+        this.stemProgress = 0;
+        this.leafProgress = 0;
+        this.centerProgress = 0;
+        this.petalProgress = 0;
+
+        this.curveOffset = (Math.random() - 0.5) * 45 * scale;
+        this.stemThickness = Math.max(2, (6 + Math.random() * 5) * scale);
+        this.tiltAngle = (Math.random() - 0.5) * 0.28;
+        this.swayPhase = Math.random() * Math.PI * 2;
+        this.swaySpeed = 0.0012 + Math.random() * 0.0012;
+
+        this.totalPetals = isHero ? 38 : Math.floor(20 + Math.random() * 12 + scale * 14);
+        this.petalColors = ['#f59e0b', '#fbbf24', '#eab308', '#d97706', '#fef08a', '#facc15'];
+        this.seedCount = isHero ? 240 : Math.floor(60 + scale * 120);
+        this.headRadiusMultiplier = 0.85 + Math.random() * 0.35;
+      }
+
+      update(dt, elapsed) {
+        if (elapsed < this.delay) return;
+
+        const timeInGrowth = elapsed - this.delay;
+
+        if (this.stemProgress < 1) {
+          this.stemProgress = Math.min(1, this.stemProgress + dt * (this.isHero ? 0.45 : 0.85));
+        } 
+        else if (this.leafProgress < 1) {
+          this.leafProgress = Math.min(1, this.leafProgress + dt * 0.95);
+        } 
+        else if (this.centerProgress < 1) {
+          this.centerProgress = Math.min(1, this.centerProgress + dt * 0.85);
+        } 
+        else if (this.petalProgress < 1) {
+          this.petalProgress = Math.min(1, this.petalProgress + dt * 0.7);
+        }
+      }
+
+      draw(ctx, globalTime) {
+        if (this.stemProgress <= 0) return;
+
+        ctx.save();
+
+        const sway = Math.sin(globalTime * this.swaySpeed + this.swayPhase) * (14 * this.scale);
+        const currentStemH = this.targetHeight * this.stemProgress;
+
+        const baseX = this.x;
+        const baseY = this.y;
+        const tipX = this.x + this.curveOffset + sway;
+        const tipY = this.y - currentStemH;
+
+        // 1. Stem
+        ctx.beginPath();
+        ctx.moveTo(baseX, baseY);
+        const cpX = baseX + (this.curveOffset + sway) * 0.5;
+        const cpY = baseY - currentStemH * 0.5;
+        ctx.quadraticCurveTo(cpX, cpY, tipX, tipY);
+
+        ctx.strokeStyle = '#234a1e';
+        ctx.lineWidth = this.stemThickness * (this.stemProgress * 0.3 + 0.7);
+        ctx.lineCap = 'round';
+        ctx.stroke();
+
+        ctx.strokeStyle = '#366d2f';
+        ctx.lineWidth = Math.max(1, this.stemThickness * 0.4);
+        ctx.stroke();
+
+        // 2. Leaves
+        if (this.leafProgress > 0) {
+          this.drawLeaves(ctx, baseX, baseY, tipX, tipY, cpX, cpY);
+        }
+
+        // 3. Flower Head
+        if (this.centerProgress > 0) {
+          this.drawHead(ctx, tipX, tipY);
+        }
+
+        ctx.restore();
+      }
+
+      drawLeaves(ctx, bx, by, tx, ty, cpx, cpy) {
+        const leafScale = this.leafProgress * this.scale;
+
+        // Left Leaf
+        const l1x = bx + (cpx - bx) * 0.45;
+        const l1y = by + (cpy - by) * 0.45;
+
+        ctx.save();
+        ctx.translate(l1x, l1y);
+        ctx.scale(leafScale, leafScale);
+        ctx.rotate(-0.75 + Math.sin(this.swayPhase) * 0.08);
+
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.bezierCurveTo(-22, -12, -38, -6, -48, 12);
+        ctx.bezierCurveTo(-32, 28, -12, 22, 0, 0);
+        ctx.fillStyle = '#225222';
+        ctx.fill();
+        ctx.strokeStyle = '#183a18';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        ctx.restore();
+
+        // Right Leaf
+        const l2x = bx + (tx - bx) * 0.65;
+        const l2y = by + (ty - by) * 0.65;
+
+        ctx.save();
+        ctx.translate(l2x, l2y);
+        ctx.scale(leafScale, leafScale);
+        ctx.rotate(0.7 - Math.sin(this.swayPhase) * 0.08);
+
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.bezierCurveTo(22, -12, 38, -6, 48, 12);
+        ctx.bezierCurveTo(32, 28, 12, 22, 0, 0);
+        ctx.fillStyle = '#286127';
+        ctx.fill();
+        ctx.strokeStyle = '#183a18';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      drawHead(ctx, headX, headY) {
+        ctx.save();
+        ctx.translate(headX, headY);
+        ctx.rotate(this.tiltAngle);
+
+        const diskRadius = 36 * this.scale * this.headRadiusMultiplier * this.centerProgress;
+
+        // Petals layer
+        if (this.petalProgress > 0) {
+          const visiblePetals = Math.floor(this.totalPetals * this.petalProgress);
+
+          for (let i = 0; i < visiblePetals; i++) {
+            const angle = i * (Math.PI * 2 / this.totalPetals);
+            const petalLen = (52 + Math.sin(i * 3.5) * 8) * this.scale * this.headRadiusMultiplier;
+            const petalWidth = 15 * this.scale * this.headRadiusMultiplier;
+            const color = this.petalColors[i % this.petalColors.length];
+
+            ctx.save();
+            ctx.rotate(angle);
+
+            const indProgress = Math.min(1, Math.max(0, (this.petalProgress * this.totalPetals - i)));
+            const scaleSpring = Math.sin(indProgress * Math.PI * 0.5);
+            ctx.scale(scaleSpring, scaleSpring);
+
+            ctx.beginPath();
+            ctx.moveTo(0, diskRadius * 0.6);
+            ctx.quadraticCurveTo(-petalWidth * 0.85, petalLen * 0.5, 0, petalLen + diskRadius * 0.6);
+            ctx.quadraticCurveTo(petalWidth * 0.85, petalLen * 0.5, 0, diskRadius * 0.6);
+
+            const pGrad = ctx.createLinearGradient(0, diskRadius * 0.6, 0, petalLen + diskRadius);
+            pGrad.addColorStop(0, '#d97706');
+            pGrad.addColorStop(0.35, color);
+            pGrad.addColorStop(1, '#fef08a');
+
+            ctx.fillStyle = pGrad;
+            ctx.fill();
+
+            // Vein detail
+            ctx.beginPath();
+            ctx.moveTo(0, diskRadius * 0.7);
+            ctx.lineTo(0, petalLen * 0.85 + diskRadius * 0.6);
+            ctx.strokeStyle = 'rgba(180, 83, 9, 0.35)';
+            ctx.lineWidth = 1 * this.scale;
+            ctx.stroke();
+
+            ctx.restore();
+          }
+        }
+
+        // Fibonacci Seed Center Disk
+        ctx.beginPath();
+        ctx.arc(0, 0, diskRadius, 0, Math.PI * 2);
+        const centerGrad = ctx.createRadialGradient(0, 0, diskRadius * 0.1, 0, 0, diskRadius);
+        centerGrad.addColorStop(0, '#261204');
+        centerGrad.addColorStop(0.7, '#3d1d07');
+        centerGrad.addColorStop(1, '#1b0c02');
+        ctx.fillStyle = centerGrad;
+        ctx.fill();
+
+        ctx.strokeStyle = '#5a2d0a';
+        ctx.lineWidth = 2 * this.scale;
+        ctx.stroke();
+
+        // Seeds
+        if (this.centerProgress > 0.3) {
+          const phi = (1 + Math.sqrt(5)) / 2;
+          const goldenAngle = (2 - phi) * Math.PI * 2;
+          const seedsToDraw = Math.floor(this.seedCount * this.centerProgress);
+
+          for (let i = 0; i < seedsToDraw; i++) {
+            const r = Math.sqrt(i / this.seedCount) * (diskRadius - 3 * this.scale);
+            const theta = i * goldenAngle;
+            const sx = r * Math.cos(theta);
+            const sy = r * Math.sin(theta);
+
+            ctx.beginPath();
+            ctx.arc(sx, sy, 1.2 * this.scale, 0, Math.PI * 2);
+            ctx.fillStyle = (i % 3 === 0) ? '#f59e0b' : '#331805';
+            ctx.fill();
+          }
+        }
+
+        ctx.restore();
+      }
+    }
+
+    function drawSunsetSky(ctx) {
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, height);
+      skyGrad.addColorStop(0, '#1e0b1c');
+      skyGrad.addColorStop(0.25, '#4a1525');
+      skyGrad.addColorStop(0.55, '#9a2b12');
+      skyGrad.addColorStop(0.78, '#f59e0b');
+      skyGrad.addColorStop(1, '#fef08a');
+
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, width, height);
+
+      const sunX = width * 0.5;
+      const sunY = height * 0.56;
+
+      const sunGlow = ctx.createRadialGradient(sunX, sunY, 10, sunX, sunY, Math.max(width, height) * 0.6);
+      sunGlow.addColorStop(0, 'rgba(254, 240, 138, 0.9)');
+      sunGlow.addColorStop(0.2, 'rgba(251, 191, 36, 0.5)');
+      sunGlow.addColorStop(0.5, 'rgba(234, 88, 12, 0.2)');
+      sunGlow.addColorStop(1, 'transparent');
+
+      ctx.fillStyle = sunGlow;
+      ctx.fillRect(0, 0, width, height);
+
+      // Sun Disc
+      ctx.beginPath();
+      ctx.arc(sunX, sunY, 48, 0, Math.PI * 2);
+      ctx.fillStyle = '#ffffff';
+      ctx.shadowColor = '#fde047';
+      ctx.shadowBlur = 40;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // Sunset Clouds
+      ctx.fillStyle = 'rgba(124, 45, 18, 0.22)';
+      for (let i = 0; i < 5; i++) {
+        const cy = height * 0.15 + i * 50;
+        const cx = (width * 0.2 + i * 180 + animationTime * 10) % (width + 300) - 150;
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, 160 + i * 30, 18, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function initParticlesAndButterflies() {
+      pollenParticles = [];
+      for (let i = 0; i < 65; i++) {
+        pollenParticles.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          radius: Math.random() * 2.2 + 0.8,
+          vx: (Math.random() - 0.5) * 0.4,
+          vy: -Math.random() * 0.6 - 0.2,
+          alpha: Math.random() * 0.7 + 0.3
+        });
+      }
+
+      butterflies = [];
+      const butterflyColors = ['monarch', 'gold', 'lavender', 'blue', 'monarch', 'gold'];
+      for (let i = 0; i < 7; i++) {
+        const bx = Math.random() * width;
+        const by = height * 0.38 + Math.random() * (height * 0.4);
+        const bScale = 0.7 + Math.random() * 0.5;
+        const bColor = butterflyColors[i % butterflyColors.length];
+        butterflies.push(new Butterfly(bx, by, bScale, bColor));
+      }
+    }
+
+    function drawPollen(ctx) {
+      pollenParticles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.y < -10) p.y = height + 10;
+        if (p.x < -10) p.x = width + 10;
+        if (p.x > width + 10) p.x = -10;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(253, 224, 71, ${p.alpha})`;
+        ctx.fill();
+      });
+    }
+
+    function drawRollingHills(ctx) {
+      // Hill 1
+      const hillGrad1 = ctx.createLinearGradient(0, height * 0.55, 0, height);
+      hillGrad1.addColorStop(0, '#2e1909');
+      hillGrad1.addColorStop(1, '#170c04');
+
+      ctx.beginPath();
+      ctx.moveTo(0, height);
+      ctx.quadraticCurveTo(width * 0.35, height * 0.52, width * 0.7, height * 0.56);
+      ctx.quadraticCurveTo(width * 0.85, height * 0.58, width, height * 0.54);
+      ctx.lineTo(width, height);
+      ctx.fillStyle = hillGrad1;
+      ctx.fill();
+
+      // Hill 2
+      const hillGrad2 = ctx.createLinearGradient(0, height * 0.62, 0, height);
+      hillGrad2.addColorStop(0, '#1f2e14');
+      hillGrad2.addColorStop(1, '#0b1407');
+
+      ctx.beginPath();
+      ctx.moveTo(0, height);
+      ctx.quadraticCurveTo(width * 0.2, height * 0.64, width * 0.5, height * 0.61);
+      ctx.quadraticCurveTo(width * 0.8, height * 0.58, width, height * 0.63);
+      ctx.lineTo(width, height);
+      ctx.fillStyle = hillGrad2;
+      ctx.fill();
+    }
+
+    function initHorizonClusters() {
+      horizonBloomClusters = [];
+      const count = Math.floor(width / 4);
+      for (let i = 0; i < count; i++) {
+        horizonBloomClusters.push({
+          x: (i / count) * width + (Math.random() - 0.5) * 8,
+          y: height * 0.55 + Math.sin(i * 0.2) * 12 + (Math.random() - 0.5) * 6,
+          radius: Math.random() * 3.2 + 1.5,
+          color: (Math.random() > 0.3) ? '#f59e0b' : '#fef08a'
+        });
+      }
+    }
+
+    function drawHorizonClusters(ctx, fieldProgress) {
+      if (fieldProgress <= 0) return;
+      const visibleCount = Math.floor(horizonBloomClusters.length * Math.min(1, fieldProgress * 1.2));
+
+      for (let i = 0; i < visibleCount; i++) {
+        const c = horizonBloomClusters[i];
+        ctx.beginPath();
+        ctx.arc(c.x, c.y, c.radius, 0, Math.PI * 2);
+        ctx.fillStyle = c.color;
+        ctx.fill();
+      }
+    }
+
+    function generateDenseField() {
+      initHorizonClusters();
+      initGrassBlades();
+      fieldSunflowers = [];
+
+      const heroH = Math.min(height * 0.52, 410);
+      heroSunflower = new Sunflower(width * 0.5, height - 20, heroH, 1.0, true, 0);
+
+      const count = Math.floor(Math.max(65, width / 11));
+
+      for (let i = 0; i < count; i++) {
+        const xRatio = (i + 0.5) / count + (Math.random() - 0.5) * 0.05;
+        const sx = Math.min(width - 15, Math.max(15, xRatio * width));
+
+        if (Math.abs(sx - width * 0.5) < 65) continue;
+
+        const depth = Math.random();
+        const scale = 0.22 + depth * 0.68;
+        const sy = height - 15 - (1 - depth) * (height * 0.28);
+        
+        const heightMultiplier = 0.75 + Math.random() * 0.45;
+        const targetH = scale * (height * 0.48) * heightMultiplier;
+
+        const distFromCenter = Math.abs(sx - width * 0.5) / (width * 0.5);
+        const delay = 2.0 + distFromCenter * 3.5 + (1 - depth) * 2.0 + Math.random() * 1.5;
+
+        fieldSunflowers.push(new Sunflower(sx, sy, targetH, scale, false, delay));
+      }
+
+      fieldSunflowers.sort((a, b) => a.scale - b.scale);
+    }
+
+    /* Planting new sunflowers on tap/click */
+    function plantCustomSunflower(x, y) {
+      if (currentPhase < 3) return;
+
+      const relativeY = Math.max(height * 0.55, Math.min(height, y));
+      const depth = (relativeY - height * 0.55) / (height * 0.45);
+      const scale = Math.max(0.3, Math.min(1.1, 0.25 + depth * 0.75));
+      const targetH = scale * (height * 0.48) * (0.85 + Math.random() * 0.3);
+
+      const newFlower = new Sunflower(x, relativeY, targetH, scale, false, 0);
+      fieldSunflowers.push(newFlower);
+      fieldSunflowers.sort((a, b) => a.scale - b.scale);
+    }
+
+    canvas.addEventListener('click', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      plantCustomSunflower(x, y);
+    });
+
+    canvas.addEventListener('touchstart', (e) => {
+      if (e.touches.length > 0) {
+        const rect = canvas.getBoundingClientRect();
+        const x = e.touches[0].clientX - rect.left;
+        const y = e.touches[0].clientY - rect.top;
+        plantCustomSunflower(x, y);
+      }
+    }, { passive: true });
+
+    let lastTimestamp = 0;
+
+    function animate(timestamp) {
+      if (!lastTimestamp) lastTimestamp = timestamp;
+      const dt = Math.min(0.05, (timestamp - lastTimestamp) / 1000);
+      lastTimestamp = timestamp;
+
+      animationTime += dt;
+      const phaseElapsed = (timestamp - phaseStartTime) / 1000;
+
+      // PHASE MANAGEMENT
+      if (currentPhase === 2) {
+        heroSunflower.update(dt, phaseElapsed);
+        if (heroSunflower.petalProgress >= 0.95 && phaseElapsed > 5.5) {
+          currentPhase = 3;
+        }
+      } else if (currentPhase === 3) {
+        heroSunflower.update(dt, phaseElapsed + 6);
+        fieldSunflowers.forEach(s => s.update(dt, phaseElapsed));
+
+        if (phaseElapsed > 10.5) {
+          currentPhase = 4;
+          showBottomHud();
+        }
+      } else if (currentPhase === 4) {
+        heroSunflower.update(dt, phaseElapsed + 15);
+        fieldSunflowers.forEach(s => s.update(dt, phaseElapsed + 10));
+      }
+
+      if (currentPhase >= 2) {
+        butterflies.forEach(b => b.update(dt));
+      }
+
+      // RENDER
+      ctx.clearRect(0, 0, width, height);
+
+      // 1. Sky & Sun
+      drawSunsetSky(ctx);
+
+      // 2. Rolling Hills
+      drawRollingHills(ctx);
+
+      // 3. Horizon Clusters
+      const waveProgress = currentPhase >= 3 ? Math.min(1, phaseElapsed / 5) : (currentPhase >= 2 ? 0.2 : 0);
+      drawHorizonClusters(ctx, waveProgress);
+
+      // 4. Grass
+      const grassGrowth = currentPhase >= 2 ? Math.min(1, phaseElapsed / 3) : 0.8;
+      drawGrassBlades(ctx, animationTime, grassGrowth);
+
+      // 5. Sunflowers
+      fieldSunflowers
+        .filter(s => s.scale < 0.6)
+        .forEach(s => s.draw(ctx, animationTime));
+
+      fieldSunflowers
+        .filter(s => s.scale >= 0.6)
+        .forEach(s => s.draw(ctx, animationTime));
+
+      if (heroSunflower) {
+        heroSunflower.draw(ctx, animationTime);
+      }
+
+      // 6. Butterflies
+      if (currentPhase >= 2) {
+        butterflies.forEach(b => b.draw(ctx));
+      }
+
+      // 7. Pollen
+      drawPollen(ctx);
+
+      requestAnimationFrame(animate);
+    }
+
+    function startExperience() {
+      // Safely start audio
+      try {
+        toggleAudio();
+      } catch(e) {
+        console.warn("Audio skipped on start:", e);
+      }
+
+      const intro = document.getElementById('introScreen');
+      const transition = document.getElementById('transitionScreen');
+
+      // 1. Fade out intro card
+      if (intro) {
+        intro.style.opacity = '0';
+        intro.style.pointerEvents = 'none';
+      }
+
+      // 2. Show transition message
+      setTimeout(() => {
+        if (transition) {
+          transition.style.opacity = '1';
+          transition.style.pointerEvents = 'auto';
+        }
+
+        // 3. Reveal canvas sunflower bloom phase
+        setTimeout(() => {
+          if (transition) {
+            transition.style.opacity = '0';
+            transition.style.pointerEvents = 'none';
+          }
+          const hud = document.getElementById('hudControls');
+          if (hud) {
+            hud.style.opacity = '1';
+            hud.style.pointerEvents = 'auto';
+          }
+
+          currentPhase = 2; // Trigger hero growth
+          phaseStartTime = performance.now();
+        }, 2800);
+      }, 600);
+    }
+
+    // Attach listeners directly to "Abrir el regalo" button for multi-device reliability
+    const startBtn = document.getElementById('startBtn');
+    if (startBtn) {
+      startBtn.addEventListener('click', startExperience);
+      startBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        startExperience();
+      });
+    }
+
+    function showBottomHud() {
+      const bottomHud = document.getElementById('bottomHud');
+      if (bottomHud) {
+        bottomHud.style.opacity = '1';
+        bottomHud.style.pointerEvents = 'auto';
+      }
+    }
+
+    function openFinalModal() {
+      const finalScreen = document.getElementById('finalScreen');
+      if (finalScreen) {
+        finalScreen.style.opacity = '1';
+        finalScreen.style.pointerEvents = 'auto';
+      }
+    }
+
+    function closeFinalModal() {
+      const finalScreen = document.getElementById('finalScreen');
+      if (finalScreen) {
+        finalScreen.style.opacity = '0';
+        finalScreen.style.pointerEvents = 'none';
+      }
+    }
+
+    /* Customization Modal functions */
+    function openEditModal() {
+      document.getElementById('inputIntroTitle').value = document.getElementById('introTitle').innerText;
+      document.getElementById('inputIntroMsg').value = document.getElementById('introMessage').innerText;
+      document.getElementById('inputFinalTitle').value = document.getElementById('finalTitle').innerText;
+      document.getElementById('inputFinalBody').value = document.getElementById('finalBody').innerText;
+      document.getElementById('inputFinalSender').value = document.getElementById('finalSender').innerText;
+
+      const editModal = document.getElementById('editModal');
+      if (editModal) {
+        editModal.style.opacity = '1';
+        editModal.style.pointerEvents = 'auto';
+      }
+    }
+
+    function closeEditModal() {
+      const editModal = document.getElementById('editModal');
+      if (editModal) {
+        editModal.style.opacity = '0';
+        editModal.style.pointerEvents = 'none';
+      }
+    }
+
+    function saveCustomizations() {
+      document.getElementById('introTitle').innerText = document.getElementById('inputIntroTitle').value;
+      document.getElementById('introMessage').innerText = document.getElementById('inputIntroMsg').value;
+      document.getElementById('finalTitle').innerText = document.getElementById('inputFinalTitle').value;
+      document.getElementById('finalBody').innerText = document.getElementById('finalBody').value;
+      document.getElementById('finalSender').innerText = document.getElementById('inputFinalSender').value;
+
+      closeEditModal();
+    }
+
+    /* Initialize application on load */
+    window.onload = function() {
+      resizeCanvas();
+      initParticlesAndButterflies();
+      generateDenseField();
+      requestAnimationFrame(animate);
+    };
+  </script>
+</body>
+</html>
